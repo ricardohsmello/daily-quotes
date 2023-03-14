@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'app-navbar',
@@ -8,9 +7,13 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  constructor() {}
+  constructor(private readonly keycloak: KeycloakService) { }
 
   ngOnInit(): void {
+  }
+
+  public async logout() {
+    this.keycloak.logout();
   }
 
 }

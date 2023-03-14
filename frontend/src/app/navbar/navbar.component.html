@@ -1,6 +1,9 @@
 <mat-toolbar color="primary">
-     <a mat-button href="/">Home</a>
-     <a mat-button href="/quotes">Quotes</a>
-     <a mat-button href="/new">Create</a>
-     <a mat-button href="/logout">Logout</a>
-   </mat-toolbar>
+  <a mat-button href="/">Home</a>
+  <a mat-button href="/quotes">Quotes</a>
+  <button mat-button [matMenuTriggerFor]="afterMenu">Admin</button>
+  <mat-menu #afterMenu="matMenu" xPosition="after">
+    <button mat-menu-item onclick="logout()">Add new Quote</button>
+  </mat-menu>
+  <a mat-button (click)="logout()">Logout</a>
+</mat-toolbar>
