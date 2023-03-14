@@ -1,0 +1,2320 @@
+@charset 'UTF-8';
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// IMPORTS
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Import any third-party CSS & Sass resources that can be easily be referenced globally across your web-application(s).
+/// @author Bruce Bentley
+/// @link https://brucebentley.io/
+/// @access public
+/// @group imports
+///
+
+///
+/// OPEN SANS (FONT)
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp.
+/// This version contains the complete 897 character set, which includes the standard ISO Latin 1, Latin CE, Greek and
+/// Cyrillic character sets. Open Sans was designed with an upright stress, open forms and a neutral, yet friendly
+/// appearance. It was optimized for print, web, and  mobile interfaces, and has excellent legibility characteristics in
+/// its letterforms.
+/// @author Steve Matteson
+/// @link https://fonts.google.com/specimen/Open+Sans/
+/// @access public
+///
+/// @example css - Usage
+///   .foo {
+///       font-family: 'Open Sans', sans-serif;
+///   }
+///
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700');
+
+///
+/// NOTO SERIF (FONT)
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Noto helps to make the web more beautiful across platforms for all languages. Currently, Noto covers
+/// over 30 scripts, and will cover all of Unicode in the future. This is the Serif Latin, Greek and Cyrillic family.
+/// It has Regular, Bold, Italic and Bold Italic styles and is hinted. It is derived from Droid, and like Droid it has a
+/// sister serif family, Noto Sans.
+/// @author Google
+/// @link https://fonts.google.com/specimen/Noto+Serif/
+/// @access public
+///
+/// @example css - Usage
+///   .foo {
+///       font-family: 'Noto Serif', serif;
+///   }
+///
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i');
+
+
+///
+/// FIRA MONO (FONT)
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Carrois Apostrophe focuses on language extension and the development of corporate type. The studio was
+/// founded in 1975 by Ralph Carrois. The typeface for Suzuki was one of Ralph’s early projects, and he has since
+/// designed typefaces for TYPO3, the Neue National Galerie, and the Museo de Art de Ponce, among many others. In
+/// cooperation with Erik Spiekermann, Carrois Apostrophe has realized projects for Cisco, the German television
+/// broadcaster ZDF, designed Fira for Mozilla, and FF Real which was released by Fontshop. The studio is currently
+/// working on new designs and smart plugins for the font editor Glyphs.
+/// @author Carrois Apostrophe
+/// @link https://fonts.google.com/specimen/Fira+Mono/
+/// @access public
+///
+/// @example css - Usage
+///   .foo {
+///       font-family: 'Fira Mono', monospace;
+///   }
+///
+@import url('https://fonts.googleapis.com/css?family=Fira+Mono:400,500,700');
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// FUNCTIONS
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description CSS & Sass functions that can be easily be referenced globally across your web-application(s).
+/// @author Bruce Bentley
+/// @link https://brucebentley.io/
+/// @access public
+/// @group functions
+///
+
+///
+/// ASCENDING
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Used to evaluate Sass maps like our grid breakpoints.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Map} $map
+/// @param {String} $map-name
+///
+/// @returns {String} $prev-key - The key of the previous item in the Sass map.
+/// @returns {Number} $prev-num - The number of the previous item in the Sass map.
+///
+@mixin _assert-ascending($map, $map-name) {
+    $prev-key: null;
+    $prev-num: null;
+
+    @each $key, $num in $map {
+        @if $prev-num == null or unit($num) == "%" or unit($prev-num) == "%" {
+        // Do nothing
+        } @else if not comparable($prev-num, $num) {
+
+            @warn "Potentially invalid value for #{$map-name}: This map must be in ascending order, but key '#{$key}' has value #{$num} whose unit makes it incomparable to #{$prev-num}, the value of the previous key '#{$prev-key}' !";
+        } @else if $prev-num >= $num {
+            @warn "Invalid value for #{$map-name}: This map must be in ascending order, but key '#{$key}' has value #{$num} which isn't greater than #{$prev-num}, the value of the previous key '#{$prev-key}' !";
+        }
+        $prev-key: $key;
+        $prev-num: $num;
+    }
+}
+
+///
+/// STARTS AT ZERO
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Used to ensure the min-width of the lowest breakpoint starts at 0.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Map} $map
+/// @param {String} $map-name - $grid-breakpoints
+///
+/// @returns {String} $first-value - The first value in the $grid-breakpoints Sass map.
+///
+@mixin _assert-starts-at-zero($map, $map-name: "$grid-breakpoints") {
+    $values: map-values($map);
+    $first-value: nth($values, 1);
+
+    @if $first-value != 0 {
+        @warn "First breakpoint in #{$map-name} must start at 0, but starts at #{$first-value}.";
+    }
+}
+
+///
+/// COLOR CONTRAST
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Provides color contrast alternatives for specified colors.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Variable} $color
+/// @param {Variable} $dark - $yiq-text-dark
+/// @param {Variable} $light - $yiq-text-light
+///
+/// @returns {Color}
+///
+@function color-yiq($color, $dark: $yiq-text-dark, $light: $yiq-text-light) {
+    $r: red($color);
+    $g: green($color);
+    $b: blue($color);
+
+    $yiq: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+
+    @if ($yiq >= $yiq-contrasted-threshold) {
+        @return $dark;
+    } @else {
+        @return $light;
+    }
+}
+
+///
+/// RETRIEVE COLOR SASS MAPS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Retrieve a color from a specified Sass map.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Map} $colors
+/// @param {Map} $theme-color
+/// @param {Map} $gray
+///
+/// @returns {Color}
+///
+@function color($key: "blue") {
+    @return map-get($colors, $key);
+}
+
+@function theme-color($key: "primary") {
+    @return map-get($theme-colors, $key);
+}
+
+@function gray($key: "100") {
+    @return map-get($grays, $key);
+}
+
+///
+/// REQUEST A THEME COLOR LEVEL
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Retrieve a color from the `theme-color` Sass map.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Map} $theme-color
+/// @param {String} $color-name
+/// @param {Number} $level
+///
+/// @returns {Color}
+///
+/// Request a theme color level
+@function theme-color-level($color-name: "primary", $level: 0) {
+    $color: theme-color($color-name);
+    $color-base: if($level > 0, $black, $white);
+    $level: abs($level);
+
+    @return mix($color-base, $color, $level * $theme-color-interval);
+}
+
+///
+/// STRIP UNIT FROM VALUE
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Removes the unit (e.g. px, em, rem) from a value, returning the number only.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Number} $num - Number to strip unit from.
+///
+/// @returns {Number} The same number, sans unit.
+///
+@function strip-unit($num) {
+    @return $num / ($num * 0 + 1);
+}
+
+///
+/// CONVERT VALUE TO REM
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Converts one or more pixel values into matching rem values.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Number|List} $values - One or more values to convert. Be sure to separate them with spaces and not commas. If you need to convert a comma-separated list, wrap the list in parentheses.
+/// @param {Number} $base [null] - The base value to use when calculating the `rem`. If you're using Foundation out of the box, this is 16px. If this parameter is `null`, the function will reference the `$global-font-size` variable as the base.
+///
+/// @returns {List} A list of converted values.
+///
+@function rem-calc($values, $base: null) {
+    $rem-values: ();
+    $count: length($values);
+
+    /// If no base is defined, defer to the global font size.
+    @if $base == null {
+        $base: $global-font-size;
+    }
+
+    /// If the base font size is a %, then multiply it by 16px.
+    /// This is because 100% font size = 16px in most all browsers.
+    @if unit($base) == '%' {
+        $base: ($base / 100%) * 16px;
+    }
+
+    /// Using rem as base allows correct scaling.
+    @if unit($base) == 'rem' {
+        $base: strip-unit($base) * 16px;
+    }
+
+    @if $count == 1 {
+        @return -zf-to-rem($values, $base);
+    }
+
+    @for $i from 1 through $count {
+        $rem-values: append($rem-values, -zf-to-rem(nth($values, $i), $base));
+    }
+
+    @return $rem-values;
+}
+
+///
+/// CONVERT VALUE TO EM
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Converts a unitless, pixel, or rem value to em, for use in breakpoints.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Number} $value - Pixel value to convert.
+///
+/// @returns {Number} A number in em, calculated based on the given value. em values are passed through as is.
+///
+@function -zf-bp-to-em($value) {
+    /// Pixel and unitless values are converted to rems.
+    @if unit($value) == 'px' or unitless($value) {
+        $value: rem-calc($value, $base: 16px);
+    }
+
+    /// Then the value is converted to ems.
+    @return strip-unit($value) * 1em;
+}
+
+///
+/// CONVERT PX to REM
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Converts a pixel value to matching rem value. *Any* value passed,
+/// regardless of unit, is assumed to be a pixel value. By default, the base pixel
+/// value used to calculate the rem value is taken from the `$global-font-size` variable.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Number} $value - Pixel value to convert.
+/// @param {Number} $base [null] - Base for pixel conversion.
+///
+/// @returns {Number} A number in rems, calculated based on the given value and the base pixel value. rem values are passed through as is.
+///
+@function -zf-to-rem($value, $base: null) {
+    /// Check if the value is a number.
+    @if type-of($value) != 'number' {
+        @warn inspect($value) + ' was passed to rem-calc(), which is not a number.';
+        @return $value;
+    }
+
+    /// Transform em into rem if someone hands over 'em's.
+    @if unit($value) == 'em' {
+        $value: strip-unit($value) * 1rem;
+    }
+
+    /// Calculate rem if units for $value is not rem or em.
+    @if unit($value) != 'rem' {
+        $value: strip-unit($value) / strip-unit($base) * 1rem;
+    }
+
+    /// Turn 0rem into 0.
+    @if $value == 0rem {
+        $value: 0;
+    }
+
+    @return $value;
+}
+
+///
+/// UNITLESS CALC
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Converts a pixel, percentage, rem or em value to a unitless value
+/// based on a given font size. Ideal for working out unitless line heights.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Number} $value - Value to convert to a unitless line height
+/// @param {Number} $base - The font size to use to work out the line height - defaults to $global-font-size
+///
+/// @return {Number} - Unitless number
+///
+@function unitless-calc($value, $base: null) {
+
+    // If no base is defined, defer to the global font size.
+    @if $base == null {
+        $base: $global-font-size;
+    }
+
+    /// First, lets convert our $base to pixels.
+
+    /// If the base font size is a %, then multiply it by 16px.
+    @if unit($base) == '%' {
+        $base: ($base / 100%) * 16px;
+    }
+
+    @if unit($base) == 'rem' {
+        $base: strip-unit($base) * 16px;
+    }
+
+    @if unit($base) == 'em' {
+        $base: strip-unit($base) * 16px;
+    }
+
+    /// Now lets convert our value to pixels too.
+    @if unit($value) == '%' {
+        $value: ($value / 100%) * $base;
+    }
+
+    @if unit($value) == 'rem' {
+        $value: strip-unit($value) * $base;
+    }
+
+    @if unit($value) == 'em' {
+        $value: strip-unit($value) * $base;
+    }
+
+    /// 'px'.
+    @if unit($value) == 'px' {
+        @return strip-unit($value) / strip-unit($base);
+    }
+
+    /// Assume that line-heights greatern then 10 are meant to be absolute in 'px'.
+    @if unitless($value) and ($value > 10) {
+        @return $value / strip-unit($base);
+    }
+
+    @return $value;
+}
+
+///
+/// STRING REPLACE
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Replace `$search` with `$replace` in `$string`. Used on our SVG
+/// icon backgrounds for custom forms.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {String} $string - Initial string
+/// @param {String} $search - Substring to replace
+/// @param {String} $replace ('') - New value
+///
+/// @return {String} - Updated string
+///
+/// @example scss - Usage
+///   $custom-control-indicator-checked-color:  $component-active-color;
+///   $custom-checkbox-indicator-icon-checked:  str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='#{$custom-control-indicator-checked-color}' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e"), "#", "%23");
+///
+///   .custom-control-input:checked ~ .custom-control-label {
+///       &::after {
+///           background-image: $custom-checkbox-indicator-icon-checked;
+///       }
+///   }
+///
+/// @example css - CSS Output
+///   ..custom-checkbox .custom-control-input:checked ~ .custom-control-label::after {
+///     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+///   }
+///
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
+///
+/// SVG COLOR STRING MODIFIER
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Checks that you have passed in an argument. Then adds quotation marks around
+/// the color argument you passed in. Then it removes the hash (#) from the color if it has a hash in it.
+/// Finally it returns the SVG as one long string with the new fill color inserted into it.
+/// @author Bruce Bentley
+/// @access public
+/// @group functions
+///
+/// @param {Boolean} $svg-color - Is there an initial SVG color?
+///
+/// @return {String} - SVG as a string with new fill color inserted into it
+///
+/// @example scss - Usage
+///     @mixin svg-color($color: false) {
+///        @if($color != false) {
+///            background-image: url(svg-color-string-modifier($color));
+///        }
+///    }
+///
+@function svg-color-string-modifier($svg-color: false) {
+    /// Checking if a color value has been passed down.
+    @if($svg-color != false) {
+        /// Adding quotes around Hex value so its actually a string.
+        $svg-color-str: quote(#{$svg-color});
+
+        /// If the color has a "#" at the start it will be removed from the string.
+        $svg-color: str-replace($svg-color-str, "#", "");
+
+        /// Returns SVG as a string with the new fill value dynamically inserted
+        @return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='%23#{$svg-color}' %3E%3Cpath d='M100 0a100 100 0 1 0 100 100A100.1 100.1 0 0 0 100 0zm43.88 123.93a5.58 5.58 0 1 1-5.58 5.59 5.58 5.58 0 0 1 5.58-5.59zm-87.75 0a5.58 5.58 0 1 1-5.57 5.59 5.58 5.58 0 0 1 5.57-5.59zM36.62 170a94.4 94.4 0 0 1-21-112.48C29.78 75 47.87 110.25 36.58 170zm63.43 24.5a94 94 0 0 1-51.07-15c10.09-14.27 46.69-75 13.29-166.15a94.42 94.42 0 0 1 75.57 0c-33.4 91.13 3.19 151.88 13.28 166.15a94 94 0 0 1-51.11 15zm63.43-24.5c-11.33-59.77 6.73-95 21-112.48a94.38 94.38 0 0 1-21 112.47zm-39.7 6.64l-1.72-13.82a4.12 4.12 0 0 0-3.08-3.51l-17.91-4.82a4.43 4.43 0 0 0-2.17 0L81 159.33a4.16 4.16 0 0 0-3.08 3.51l-1.72 13.82a4.22 4.22 0 0 0 .41 2.4c.71 1.39 5.14 8.22 23.35 8.31s22.6-6.92 23.34-8.31a4.09 4.09 0 0 0 .48-2.4z'/%3E%3C/svg%3E";
+    }
+}
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// VARIABLES
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description CSS & Sass variables that can be easily be referenced globally across your web-application(s).
+/// @author Bruce Bentley
+/// @link https://brucebentley.io/
+/// @access public
+/// @group variables
+///
+
+///
+/// GLOBAL CONSTANTS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Global CSS & Sass variable constants.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$pi:                    3.1415926535;
+$global-font-size:      100% !default;
+
+///
+/// COLOR SYSTEM
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Global CSS & Sass color system variables & Sass maps.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$white:    #ffffff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #6c757d !default;
+$gray-700: #495057 !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black:    #000000 !default;
+
+///
+/// GRAYS —[ SASS MAP ]—
+///
+$grays: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$grays: map-merge(
+(
+    "100": $gray-100,
+    "200": $gray-200,
+    "300": $gray-300,
+    "400": $gray-400,
+    "500": $gray-500,
+    "600": $gray-600,
+    "700": $gray-700,
+    "800": $gray-800,
+    "900": $gray-900
+),
+$grays
+);
+
+///
+/// PRIMARY COLORS
+///
+$blue:    #007bff !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #dc3545 !default;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:   #28a745 !default;
+$teal:    #20c997 !default;
+$cyan:    #17a2b8 !default;
+
+///
+/// COLORS —[ SASS MAP ]—
+///
+$colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$colors: map-merge(
+(
+    "blue":       $blue,
+    "indigo":     $indigo,
+    "purple":     $purple,
+    "pink":       $pink,
+    "red":        $red,
+    "orange":     $orange,
+    "yellow":     $yellow,
+    "green":      $green,
+    "teal":       $teal,
+    "cyan":       $cyan,
+    "white":      $white,
+    "gray":       $gray-600,
+    "gray-dark":  $gray-800
+),
+$colors
+);
+
+$primary:       $blue !default;
+$secondary:     $gray-600 !default;
+$success:       $green !default;
+$info:          $cyan !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-100 !default;
+$dark:          $gray-800 !default;
+
+///
+/// THEME COLORS —[ SASS MAP ]—
+///
+$theme-colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors: map-merge(
+(
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "light":      $light,
+    "dark":       $dark
+),
+$theme-colors
+);
+
+/// Set a specific jump point for requesting color jumps
+$theme-color-interval:      8% !default;
+
+/// The yiq lightness value that determines when the lightness of color changes
+/// from 'dark' to 'light'. Acceptable values are between 0 and 255.
+$yiq-contrasted-threshold:  150 !default;
+
+/// Customize the light and dark text colors for use in our YIQ color contrast function.
+$yiq-text-dark:             $gray-900 !default;
+$yiq-text-light:            $white !default;
+
+///
+/// OPTIONS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Quickly modify global styling by enabling or disabling optional features.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$enable-caret:                                true !default;
+$enable-rounded:                              true !default;
+$enable-shadows:                              false !default;
+$enable-gradients:                            false !default;
+$enable-transitions:                          true !default;
+$enable-prefers-reduced-motion-media-query:   true !default;
+$enable-hover-media-query:                    false !default;    /// Deprecated, No Longer Affects Any Compiled CSS
+$enable-grid-classes:                         true !default;
+$enable-pointer-cursor-for-buttons:           true !default;
+$enable-print-styles:                         true !default;
+$enable-responsive-font-sizes:                false !default;
+$enable-validation-icons:                     true !default;
+$enable-deprecation-messages:                 true !default;
+
+///
+/// SPACING
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Control the default styling of most Bootstrap elements by modifying these variables.
+/// Mostly focused on spacing. You can add more entries to the $spacers map, should you need more variation.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$spacer: 1rem !default;
+
+///
+/// SPACERS —[ SASS MAP ]—
+///
+$spacers: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$spacers: map-merge(
+(
+    0: 0,
+    1: ($spacer * 0.25),
+    2: ($spacer * 0.5),
+    3: $spacer,
+    4: ($spacer * 1.5),
+    5: ($spacer * 3)
+),
+$spacers
+);
+
+///
+/// SIZES —[ SASS MAP ]—
+///
+/// This variable affects the `.h-*` and `.w-*` classes.
+$sizes: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$sizes: map-merge(
+(
+    25: 25%,
+    50: 50%,
+    75: 75%,
+    100: 100%,
+    auto: auto
+),
+$sizes
+);
+
+///
+/// BODY
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Settings for the `<body>` element.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$body-bg:                   $white !default;
+$body-color:                $gray-900 !default;
+
+///
+/// LINKS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Style <a> (anchor) elements.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$link-color:                theme-color("primary") !default;
+$link-decoration:           none !default;
+$link-hover-color:          darken($link-color, 15%) !default;
+$link-hover-decoration:     underline !default;
+$emphasized-link-hover-darken-percentage: 15% !default;    /// Darken percentage for links with `.text-*` class (e.g. `.text-success`).
+
+///
+/// PARAGRAPHS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Style <p> (paragraph) elements.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$paragraph-margin-bottom:   1rem !default;
+
+///
+/// GRID BREAKPOINTS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Define the minimum dimensions at which your layout will change, adapting to
+/// different screen sizes, for use in media queries.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$grid-breakpoints: (
+xs: 0,
+sm: 576px,
+md: 768px,
+lg: 992px,
+xl: 1200px
+) !default;
+
+@include _assert-ascending($grid-breakpoints, '$grid-breakpoints');
+@include _assert-starts-at-zero($grid-breakpoints, '$grid-breakpoints');
+
+///
+/// GRID CONTAINERS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Define the maximum width of `.container` for different screen sizes.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$container-max-widths: (
+sm: 540px,
+md: 720px,
+lg: 960px,
+xl: 1140px
+) !default;
+
+@include _assert-ascending($container-max-widths, '$container-max-widths');
+
+///
+/// GRID COLUMNS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Set the number of columns and specify the width of the gutters.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$grid-columns:                12 !default;
+$grid-gutter-width:           30px !default;
+
+///
+/// COMPONENTS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Define common padding and border radius sizes and more.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$line-height-lg:              1.5 !default;
+$line-height-sm:              1.5 !default;
+
+$border-width:                1px !default;
+$border-color:                $gray-300 !default;
+
+$border-radius:               0.25rem !default;
+$border-radius-lg:            0.3rem !default;
+$border-radius-sm:            0.2rem !default;
+
+$rounded-pill:                50rem !default;
+
+$box-shadow-sm:               0 0.125rem 0.25rem rgba($black, 0.075) !default;
+$box-shadow:                  0 0.5rem 1rem rgba($black, 0.15) !default;
+$box-shadow-lg:               0 1rem 3rem rgba($black, 0.175) !default;
+
+$component-active-color:      $white !default;
+$component-active-bg:         theme-color("primary") !default;
+
+$caret-width:                 0.3em !default;
+$caret-vertical-align:        $caret-width * 0.85 !default;
+$caret-spacing:               $caret-width * 0.85 !default;
+
+$transition-base:             all 0.2s ease-in-out !default;
+$transition-fade:             opacity 0.15s linear !default;
+$transition-collapse:         height 0.35s ease !default;
+
+///
+/// EMBED RESPONSIVE ASPECT RATIOS —[ SASS MAP ]—
+///
+$embed-responsive-aspect-ratios: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$embed-responsive-aspect-ratios: join(
+(
+    (21 9),
+    (16 9),
+    (4 3),
+    (1 1),
+),
+$embed-responsive-aspect-ratios
+);
+
+///
+/// TYPOGRAPHY
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Font, line-height, and color for body text, headings, and more.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+// stylelint-disable value-keyword-case
+$font-family-sans-serif:            'Open Sans',  'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', sans-serif,
+                                    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !default;
+$font-family-serif:                 'Noto Serif', 'Georgia', 'Times New Roman', 'Times', serif !default;
+$font-family-monospace:             'Fira Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace !default;
+$font-family-base:                  $font-family-sans-serif !default;
+// stylelint-enable value-keyword-case
+
+$font-size-base:                    1rem !default;    // Assumes The Browser Default, Typically `16px`
+$font-size-lg:                      $font-size-base * 1.25 !default;
+$font-size-sm:                      $font-size-base * 0.875 !default;
+
+$font-weight-lighter:               lighter !default;
+$font-weight-light:                 300 !default;
+$font-weight-normal:                400 !default;
+$font-weight-bold:                  700 !default;
+$font-weight-bolder:                bolder !default;
+
+$font-weight-base:                  $font-weight-normal !default;
+$line-height-base:                  1.5 !default;
+
+$h1-font-size:                      $font-size-base * 2.5 !default;
+$h2-font-size:                      $font-size-base * 2 !default;
+$h3-font-size:                      $font-size-base * 1.75 !default;
+$h4-font-size:                      $font-size-base * 1.5 !default;
+$h5-font-size:                      $font-size-base * 1.25 !default;
+$h6-font-size:                      $font-size-base !default;
+
+$headings-margin-bottom:            $spacer / 2 !default;
+$headings-font-family:              null !default;
+$headings-font-weight:              500 !default;
+$headings-line-height:              1.2 !default;
+$headings-color:                    null !default;
+
+$display1-size:                     6rem !default;
+$display2-size:                     5.5rem !default;
+$display3-size:                     4.5rem !default;
+$display4-size:                     3.5rem !default;
+
+$display1-weight:                   300 !default;
+$display2-weight:                   300 !default;
+$display3-weight:                   300 !default;
+$display4-weight:                   300 !default;
+$display-line-height:               $headings-line-height !default;
+
+$lead-font-size:                    $font-size-base * 1.25 !default;
+$lead-font-weight:                  300 !default;
+
+$small-font-size:                   80% !default;
+
+$text-muted:                        $gray-600 !default;
+
+$blockquote-bg:                     $gray-200;
+$blockquote-border-accent-color:    rgba(theme-color("primary"), 0.87);
+$blockquote-border-accent-width:    0.5rem;
+$blockquote-border-color:           $gray-300;
+$blockquote-border-width:           $border-width;
+$blockquote-color:                  $gray-600;
+$blockquote-small-color:            theme-color("dark") !default;
+$blockquote-small-font-size:        $small-font-size !default;
+$blockquote-font-size:              $font-size-base * 1.25 !default;
+$blockquote-font-style:             italic;
+$blockquote-margin:                 1.875rem;
+
+$hr-border-color:                   rgba($black, 0.1) !default;
+$hr-border-width:                   $border-width !default;
+
+$mark-padding:                      0.2em !default;
+
+$dt-font-weight:                    $font-weight-bold !default;
+
+$kbd-box-shadow:                    inset 0 -.1rem 0 rgba($black, 0.25) !default;
+$nested-kbd-font-weight:            $font-weight-bold !default;
+
+$list-inline-padding:               0.5rem !default;
+
+$mark-bg:                           #fcf8e3 !default;
+
+$hr-margin-y:                       $spacer !default;
+
+///
+/// TABLES
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Customizes the `.table` component with basic values, each used across all table variations.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$table-cell-padding:          0.75rem !default;
+$table-cell-padding-sm:       0.3rem !default;
+
+$table-color:                 $body-color !default;
+$table-bg:                    null !default;
+$table-accent-bg:             rgba($black, 0.05) !default;
+$table-hover-color:           $table-color !default;
+$table-hover-bg:              rgba($black, 0.075) !default;
+$table-active-bg:             $table-hover-bg !default;
+
+$table-border-width:          $border-width !default;
+$table-border-color:          $border-color !default;
+
+$table-head-bg:               $gray-200 !default;
+$table-head-color:            $gray-700 !default;
+
+$table-dark-color:            $white !default;
+$table-dark-bg:               $gray-800 !default;
+$table-dark-accent-bg:        rgba($white, 0.05) !default;
+$table-dark-hover-color:      $table-dark-color !default;
+$table-dark-hover-bg:         rgba($white, 0.075) !default;
+$table-dark-border-color:     lighten($table-dark-bg, 7.5%) !default;
+
+$table-striped-order:         odd !default;
+
+$table-caption-color:         $text-muted !default;
+
+$table-bg-level:              -9 !default;
+$table-border-level:          -6 !default;
+
+///
+/// BUTTONS + FORMS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$input-btn-padding-y:         0.375rem !default;
+$input-btn-padding-x:         0.75rem !default;
+$input-btn-font-family:       null !default;
+$input-btn-font-size:         $font-size-base !default;
+$input-btn-line-height:       $line-height-base !default;
+
+$input-btn-focus-width:       0.2rem !default;
+$input-btn-focus-color:       rgba($component-active-bg, 0.25) !default;
+$input-btn-focus-box-shadow:  0 0 0 $input-btn-focus-width $input-btn-focus-color !default;
+
+$input-btn-padding-y-sm:      0.25rem !default;
+$input-btn-padding-x-sm:      0.5rem !default;
+$input-btn-font-size-sm:      $font-size-sm !default;
+$input-btn-line-height-sm:    $line-height-sm !default;
+
+$input-btn-padding-y-lg:      0.5rem !default;
+$input-btn-padding-x-lg:      1rem !default;
+$input-btn-font-size-lg:      $font-size-lg !default;
+$input-btn-line-height-lg:    $line-height-lg !default;
+
+$input-btn-border-width:      $border-width !default;
+
+///
+/// BUTTONS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description For each of Bootstrap's buttons, define text, background, and border color.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$btn-padding-y:               $input-btn-padding-y !default;
+$btn-padding-x:               $input-btn-padding-x !default;
+$btn-font-family:             $input-btn-font-family !default;
+$btn-font-size:               $input-btn-font-size !default;
+$btn-line-height:             $input-btn-line-height !default;
+
+$btn-padding-y-sm:            $input-btn-padding-y-sm !default;
+$btn-padding-x-sm:            $input-btn-padding-x-sm !default;
+$btn-font-size-sm:            $input-btn-font-size-sm !default;
+$btn-line-height-sm:          $input-btn-line-height-sm !default;
+
+$btn-padding-y-lg:            $input-btn-padding-y-lg !default;
+$btn-padding-x-lg:            $input-btn-padding-x-lg !default;
+$btn-font-size-lg:            $input-btn-font-size-lg !default;
+$btn-line-height-lg:          $input-btn-line-height-lg !default;
+
+$btn-border-width:            $input-btn-border-width !default;
+
+$btn-font-weight:             $font-weight-normal !default;
+$btn-box-shadow:              inset 0 1px 0 rgba($white, 0.15),
+                            0 1px 1px rgba($black, 0.075) !default;
+$btn-focus-width:             $input-btn-focus-width !default;
+$btn-focus-box-shadow:        $input-btn-focus-box-shadow !default;
+$btn-disabled-opacity:        0.65 !default;
+$btn-active-box-shadow:       inset 0 3px 5px rgba($black, 0.125) !default;
+
+$btn-link-disabled-color:     $gray-600 !default;
+
+$btn-block-spacing-y:         0.5rem !default;
+
+/// Allows for customizing button radius independently from global border radius.
+$btn-border-radius:           $border-radius !default;
+$btn-border-radius-lg:        $border-radius-lg !default;
+$btn-border-radius-sm:        $border-radius-sm !default;
+
+$btn-transition:              color 0.15s ease-in-out,
+                            background-color 0.15s ease-in-out,
+                            border-color 0.15s ease-in-out,
+                            box-shadow 0.15s ease-in-out !default;
+
+///
+/// FORMS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Shared variables that are reassigned to Bootstrap's form elements.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$label-margin-bottom:                   0.5rem !default;
+
+$input-padding-y:                       $input-btn-padding-y !default;
+$input-padding-x:                       $input-btn-padding-x !default;
+$input-font-family:                     $input-btn-font-family !default;
+$input-font-size:                       $input-btn-font-size !default;
+$input-font-weight:                     $font-weight-base !default;
+$input-line-height:                     $input-btn-line-height !default;
+
+$input-padding-y-sm:                    $input-btn-padding-y-sm !default;
+$input-padding-x-sm:                    $input-btn-padding-x-sm !default;
+$input-font-size-sm:                    $input-btn-font-size-sm !default;
+$input-line-height-sm:                  $input-btn-line-height-sm !default;
+
+$input-padding-y-lg:                    $input-btn-padding-y-lg !default;
+$input-padding-x-lg:                    $input-btn-padding-x-lg !default;
+$input-font-size-lg:                    $input-btn-font-size-lg !default;
+$input-line-height-lg:                  $input-btn-line-height-lg !default;
+
+$input-bg:                              $white !default;
+$input-disabled-bg:                     $gray-200 !default;
+
+$input-color:                           $gray-700 !default;
+$input-border-color:                    $gray-400 !default;
+$input-border-width:                    $input-btn-border-width !default;
+$input-box-shadow:                      inset 0 1px 1px rgba($black, 0.075) !default;
+
+$input-border-radius:                   $border-radius !default;
+$input-border-radius-lg:                $border-radius-lg !default;
+$input-border-radius-sm:                $border-radius-sm !default;
+
+$input-focus-bg:                        $input-bg !default;
+$input-focus-border-color:              lighten($component-active-bg, 25%) !default;
+$input-focus-color:                     $input-color !default;
+$input-focus-width:                     $input-btn-focus-width !default;
+$input-focus-box-shadow:                $input-btn-focus-box-shadow !default;
+
+$input-placeholder-color:               $gray-600 !default;
+$input-plaintext-color:                 $body-color !default;
+
+$input-height-border:                   $input-border-width * 2 !default;
+
+$input-height-inner:                    calc(#{$input-line-height * 1em} + #{$input-padding-y * 2}) !default;
+$input-height-inner-half:               calc(#{$input-line-height * 0.5em} + #{$input-padding-y}) !default;
+$input-height-inner-quarter:            calc(#{$input-line-height * 0.25em} + #{$input-padding-y / 2}) !default;
+
+$input-height:                          calc(#{$input-line-height * 1em} + #{$input-padding-y * 2} + #{$input-height-border}) !default;
+$input-height-sm:                       calc(#{$input-line-height-sm * 1em} + #{$input-btn-padding-y-sm * 2} + #{$input-height-border}) !default;
+$input-height-lg:                       calc(#{$input-line-height-lg * 1em} + #{$input-btn-padding-y-lg * 2} + #{$input-height-border}) !default;
+
+$input-transition:                      border-color 0.15s ease-in-out,
+                                        box-shadow 0.15s ease-in-out !default;
+
+$form-text-margin-top:                  0.25rem !default;
+
+$form-check-input-gutter:               1.25rem !default;
+$form-check-input-margin-y:             0.3rem !default;
+$form-check-input-margin-x:             0.25rem !default;
+
+$form-check-inline-margin-x:            0.75rem !default;
+$form-check-inline-input-margin-x:      0.3125rem !default;
+
+$form-grid-gutter-width:                10px !default;
+$form-group-margin-bottom:              1rem !default;
+
+$input-group-addon-color:               $input-color !default;
+$input-group-addon-bg:                  $gray-200 !default;
+$input-group-addon-border-color:        $input-border-color !default;
+
+$custom-forms-transition:               background-color 0.15s ease-in-out,
+                                        border-color 0.15s ease-in-out,
+                                        box-shadow 0.15s ease-in-out !default;
+
+$custom-control-gutter:                 0.5rem !default;
+$custom-control-spacer-x:               1rem !default;
+
+$custom-control-indicator-size:         1rem !default;
+$custom-control-indicator-bg:           $input-bg !default;
+
+$custom-control-indicator-bg-size:      50% 50% !default;
+$custom-control-indicator-box-shadow:   $input-box-shadow !default;
+$custom-control-indicator-border-color: $gray-500 !default;
+$custom-control-indicator-border-width: $input-border-width !default;
+
+$custom-control-label-color:            null !default;
+
+$custom-control-indicator-disabled-bg:          $input-disabled-bg !default;
+$custom-control-label-disabled-color:           $gray-600 !default;
+
+$custom-control-indicator-checked-color:        $component-active-color !default;
+$custom-control-indicator-checked-bg:           $component-active-bg !default;
+$custom-control-indicator-checked-disabled-bg:  rgba(theme-color("primary"), 0.5) !default;
+$custom-control-indicator-checked-box-shadow:   none !default;
+$custom-control-indicator-checked-border-color: $custom-control-indicator-checked-bg !default;
+
+$custom-control-indicator-focus-box-shadow:     $input-focus-box-shadow !default;
+$custom-control-indicator-focus-border-color:   $input-focus-border-color !default;
+
+$custom-control-indicator-active-color:         $component-active-color !default;
+$custom-control-indicator-active-bg:            lighten($component-active-bg, 35%) !default;
+$custom-control-indicator-active-box-shadow:    none !default;
+$custom-control-indicator-active-border-color:  $custom-control-indicator-active-bg !default;
+
+$custom-checkbox-indicator-border-radius:       $border-radius !default;
+$custom-checkbox-indicator-icon-checked:        str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='#{$custom-control-indicator-checked-color}' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e"), "#", "%23") !default;
+
+$custom-checkbox-indicator-indeterminate-bg:           $component-active-bg !default;
+$custom-checkbox-indicator-indeterminate-color:        $custom-control-indicator-checked-color !default;
+$custom-checkbox-indicator-icon-indeterminate:         str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3e%3cpath stroke='#{$custom-checkbox-indicator-indeterminate-color}' d='M0 2h4'/%3e%3c/svg%3e"), "#", "%23") !default;
+$custom-checkbox-indicator-indeterminate-box-shadow:   none !default;
+$custom-checkbox-indicator-indeterminate-border-color: $custom-checkbox-indicator-indeterminate-bg !default;
+
+$custom-radio-indicator-border-radius:          50% !default;
+$custom-radio-indicator-icon-checked:           str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='#{$custom-control-indicator-checked-color}'/%3e%3c/svg%3e"), "#", "%23") !default;
+
+$custom-switch-width:                           $custom-control-indicator-size * 1.75 !default;
+$custom-switch-indicator-border-radius:         $custom-control-indicator-size / 2 !default;
+$custom-switch-indicator-size:                  calc(#{$custom-control-indicator-size} - #{$custom-control-indicator-border-width * 4}) !default;
+
+$custom-select-padding-y:           $input-padding-y !default;
+$custom-select-padding-x:           $input-padding-x !default;
+$custom-select-font-family:         $input-font-family !default;
+$custom-select-font-size:           $input-font-size !default;
+$custom-select-height:              $input-height !default;
+$custom-select-indicator-padding:   1rem !default;    /// Extra Padding To Account For The Presence Of The Background-image Based Indicator
+$custom-select-font-weight:         $input-font-weight !default;
+$custom-select-line-height:         $input-line-height !default;
+$custom-select-color:               $input-color !default;
+$custom-select-disabled-color:      $gray-600 !default;
+$custom-select-bg:                  $input-bg !default;
+$custom-select-disabled-bg:         $gray-200 !default;
+$custom-select-bg-size:             8px 10px !default;    /// In Pixels Because Image Dimensions
+$custom-select-indicator-color:     $gray-800 !default;
+$custom-select-indicator:           str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='#{$custom-select-indicator-color}' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e"), "#", "%23") !default;
+$custom-select-background:          $custom-select-indicator no-repeat right $custom-select-padding-x center / $custom-select-bg-size !default;    /// Used So We Can Have Multiple background elements (e.g., arrow and feedback icon)
+
+$custom-select-feedback-icon-padding-right: calc((1em + #{2 * $custom-select-padding-y}) * 3 / 4 + #{$custom-select-padding-x + $custom-select-indicator-padding}) !default;
+$custom-select-feedback-icon-position:      center right ($custom-select-padding-x + $custom-select-indicator-padding) !default;
+$custom-select-feedback-icon-size:          $input-height-inner-half $input-height-inner-half !default;
+
+$custom-select-border-width:        $input-border-width !default;
+$custom-select-border-color:        $input-border-color !default;
+$custom-select-border-radius:       $border-radius !default;
+$custom-select-box-shadow:          inset 0 1px 2px rgba($black, 0.075) !default;
+
+$custom-select-focus-border-color:  $input-focus-border-color !default;
+$custom-select-focus-width:         $input-focus-width !default;
+$custom-select-focus-box-shadow:    0 0 0 $custom-select-focus-width $input-btn-focus-color !default;
+
+$custom-select-padding-y-sm:        $input-padding-y-sm !default;
+$custom-select-padding-x-sm:        $input-padding-x-sm !default;
+$custom-select-font-size-sm:        $input-font-size-sm !default;
+$custom-select-height-sm:           $input-height-sm !default;
+
+$custom-select-padding-y-lg:        $input-padding-y-lg !default;
+$custom-select-padding-x-lg:        $input-padding-x-lg !default;
+$custom-select-font-size-lg:        $input-font-size-lg !default;
+$custom-select-height-lg:           $input-height-lg !default;
+
+$custom-range-track-width:          100% !default;
+$custom-range-track-height:         0.5rem !default;
+$custom-range-track-cursor:         pointer !default;
+$custom-range-track-bg:             $gray-300 !default;
+$custom-range-track-border-radius:  1rem !default;
+$custom-range-track-box-shadow:     inset 0 0.25rem 0.25rem rgba($black, 0.1) !default;
+
+$custom-range-thumb-width:                   1rem !default;
+$custom-range-thumb-height:                  $custom-range-thumb-width !default;
+$custom-range-thumb-bg:                      $component-active-bg !default;
+$custom-range-thumb-border:                  0 !default;
+$custom-range-thumb-border-radius:           1rem !default;
+$custom-range-thumb-box-shadow:              0 0.1rem 0.25rem rgba($black, 0.1) !default;
+$custom-range-thumb-focus-box-shadow:        0 0 0 1px $body-bg, $input-focus-box-shadow !default;
+$custom-range-thumb-focus-box-shadow-width:  $input-focus-width !default;    /// For Focus Box Shadow Issue In Ie/edge
+$custom-range-thumb-active-bg:               lighten($component-active-bg, 35%) !default;
+$custom-range-thumb-disabled-bg:             $gray-500 !default;
+
+$custom-file-height:                $input-height !default;
+$custom-file-height-inner:          $input-height-inner !default;
+$custom-file-focus-border-color:    $input-focus-border-color !default;
+$custom-file-focus-box-shadow:      $input-focus-box-shadow !default;
+$custom-file-disabled-bg:           $input-disabled-bg !default;
+
+$custom-file-padding-y:             $input-padding-y !default;
+$custom-file-padding-x:             $input-padding-x !default;
+$custom-file-line-height:           $input-line-height !default;
+$custom-file-font-family:           $input-font-family !default;
+$custom-file-font-weight:           $input-font-weight !default;
+$custom-file-color:                 $input-color !default;
+$custom-file-bg:                    $input-bg !default;
+$custom-file-border-width:          $input-border-width !default;
+$custom-file-border-color:          $input-border-color !default;
+$custom-file-border-radius:         $input-border-radius !default;
+$custom-file-box-shadow:            $input-box-shadow !default;
+$custom-file-button-color:          $custom-file-color !default;
+$custom-file-button-bg:             $input-group-addon-bg !default;
+$custom-file-text: (
+en: "Browse"
+) !default;
+
+///
+/// FORM VALIDATIONS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Shared variables that are reassigned to Bootstrap's form validations.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$form-feedback-margin-top:          $form-text-margin-top !default;
+$form-feedback-font-size:           $small-font-size !default;
+$form-feedback-valid-color:         theme-color("success") !default;
+$form-feedback-invalid-color:       theme-color("danger") !default;
+
+$form-feedback-icon-valid-color:    $form-feedback-valid-color !default;
+$form-feedback-icon-valid:          str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e"), "#", "%23") !default;
+$form-feedback-icon-invalid-color:  $form-feedback-invalid-color !default;
+$form-feedback-icon-invalid:        str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='#{$form-feedback-icon-invalid-color}' viewBox='-2 -2 7 7'%3e%3cpath stroke='#{$form-feedback-icon-invalid-color}' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E"), "#", "%23") !default;
+
+///
+/// FORM VALIDATION STATES —[ SASS MAP ]—
+///
+$form-validation-states: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-validation-states: map-merge(
+(
+    "valid": (
+    "color": $form-feedback-valid-color,
+    "icon": $form-feedback-icon-valid
+    ),
+    "invalid": (
+    "color": $form-feedback-invalid-color,
+    "icon": $form-feedback-icon-invalid
+    ),
+),
+$form-validation-states
+);
+
+///
+/// Z-INDEX MASTER LIST
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Warning: Avoid customizing these values. They're used for a bird's eye view of
+/// components dependent on the z-axis and are designed to all work together.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$zindex-dropdown:                   1000 !default;
+$zindex-sticky:                     1020 !default;
+$zindex-fixed:                      1030 !default;
+$zindex-modal-backdrop:             1040 !default;
+$zindex-modal:                      1050 !default;
+$zindex-popover:                    1060 !default;
+$zindex-tooltip:                    1070 !default;
+
+///
+/// NAVS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Navigation containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$nav-link-padding-y:                0.5rem !default;
+$nav-link-padding-x:                1rem !default;
+$nav-link-disabled-color:           $gray-600 !default;
+
+$nav-tabs-border-color:             $gray-300 !default;
+$nav-tabs-border-width:             $border-width !default;
+$nav-tabs-border-radius:            $border-radius !default;
+$nav-tabs-link-hover-border-color:  $gray-200 $gray-200 $nav-tabs-border-color !default;
+$nav-tabs-link-active-color:        $gray-700 !default;
+$nav-tabs-link-active-bg:           $body-bg !default;
+$nav-tabs-link-active-border-color: $gray-300 $gray-300 $nav-tabs-link-active-bg !default;
+
+$nav-pills-border-radius:           $border-radius !default;
+$nav-pills-link-active-color:       $component-active-color !default;
+$nav-pills-link-active-bg:          $component-active-bg !default;
+
+$nav-divider-color:                 $gray-200 !default;
+$nav-divider-margin-y:              $spacer / 2 !default;
+
+///
+/// NAVBAR
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Navbar container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$navbar-padding-y:                  $spacer / 2 !default;
+$navbar-padding-x:                  $spacer !default;
+
+$navbar-nav-link-padding-x:         0.5rem !default;
+
+$navbar-brand-font-size:            $font-size-lg !default;
+/// Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
+$nav-link-height:                   $font-size-base * $line-height-base + $nav-link-padding-y * 2 !default;
+$navbar-brand-height:               $navbar-brand-font-size * $line-height-base !default;
+$navbar-brand-padding-y:            ($nav-link-height - $navbar-brand-height) / 2 !default;
+
+$navbar-toggler-padding-y:          0.25rem !default;
+$navbar-toggler-padding-x:          0.75rem !default;
+$navbar-toggler-font-size:          $font-size-lg !default;
+$navbar-toggler-border-radius:      $btn-border-radius !default;
+
+$navbar-dark-color:                 rgba($white, 0.5) !default;
+$navbar-dark-hover-color:           rgba($white, 0.75) !default;
+$navbar-dark-active-color:          $white !default;
+$navbar-dark-disabled-color:        rgba($white, 0.25) !default;
+$navbar-dark-toggler-icon-bg:       str-replace(url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='#{$navbar-dark-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"), "#", "%23") !default;
+$navbar-dark-toggler-border-color:  rgba($white, 0.1) !default;
+
+$navbar-light-color:                rgba($black, 0.5) !default;
+$navbar-light-hover-color:          rgba($black, 0.7) !default;
+$navbar-light-active-color:         rgba($black, 0.9) !default;
+$navbar-light-disabled-color:       rgba($black, 0.3) !default;
+$navbar-light-toggler-icon-bg:      str-replace(url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='#{$navbar-light-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"), "#", "%23") !default;
+$navbar-light-toggler-border-color: rgba($black, 0.1) !default;
+
+$navbar-light-brand-color:                $navbar-light-active-color !default;
+$navbar-light-brand-hover-color:          $navbar-light-active-color !default;
+$navbar-dark-brand-color:                 $navbar-dark-active-color !default;
+$navbar-dark-brand-hover-color:           $navbar-dark-active-color !default;
+
+///
+/// DROPDOWNS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Dropdown menu container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$dropdown-min-width:                10rem !default;
+$dropdown-padding-y:                0.5rem !default;
+$dropdown-spacer:                   0.125rem !default;
+$dropdown-font-size:                $font-size-base !default;
+$dropdown-color:                    $body-color !default;
+$dropdown-bg:                       $white !default;
+$dropdown-border-color:             rgba($black, 0.15) !default;
+$dropdown-border-radius:            $border-radius !default;
+$dropdown-border-width:             $border-width !default;
+$dropdown-inner-border-radius:      calc(#{$dropdown-border-radius} - #{$dropdown-border-width}) !default;
+$dropdown-divider-bg:               $gray-200 !default;
+$dropdown-divider-margin-y:         $nav-divider-margin-y !default;
+$dropdown-box-shadow:               0 0.5rem 1rem rgba($black, 0.175) !default;
+
+$dropdown-link-color:               $gray-900 !default;
+$dropdown-link-hover-color:         darken($gray-900, 5%) !default;
+$dropdown-link-hover-bg:            $gray-100 !default;
+
+$dropdown-link-active-color:        $component-active-color !default;
+$dropdown-link-active-bg:           $component-active-bg !default;
+
+$dropdown-link-disabled-color:      $gray-600 !default;
+
+$dropdown-item-padding-y:           0.25rem !default;
+$dropdown-item-padding-x:           1.5rem !default;
+
+$dropdown-header-color:             $gray-600 !default;
+
+///
+/// PAGINATION
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Shared variables that are reassigned to Bootstrap's pagination elements.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$pagination-padding-y:              0.5rem !default;
+$pagination-padding-x:              0.75rem !default;
+$pagination-padding-y-sm:           0.25rem !default;
+$pagination-padding-x-sm:           0.5rem !default;
+$pagination-padding-y-lg:           0.75rem !default;
+$pagination-padding-x-lg:           1.5rem !default;
+$pagination-line-height:            1.25 !default;
+
+$pagination-color:                  $link-color !default;
+$pagination-bg:                     $white !default;
+$pagination-border-width:           $border-width !default;
+$pagination-border-color:           $gray-300 !default;
+
+$pagination-focus-box-shadow:       $input-btn-focus-box-shadow !default;
+$pagination-focus-outline:          0 !default;
+
+$pagination-hover-color:            $link-hover-color !default;
+$pagination-hover-bg:               $gray-200 !default;
+$pagination-hover-border-color:     $gray-300 !default;
+
+$pagination-active-color:           $component-active-color !default;
+$pagination-active-bg:              $component-active-bg !default;
+$pagination-active-border-color:    $pagination-active-bg !default;
+
+$pagination-disabled-color:         $gray-600 !default;
+$pagination-disabled-bg:            $white !default;
+$pagination-disabled-border-color:  $gray-300 !default;
+
+///
+/// JUMBOTRON
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Jumbotron container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$jumbotron-padding:                 2rem !default;
+$jumbotron-color:                   null !default;
+$jumbotron-bg:                      $gray-200 !default;
+
+///
+/// CARDS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Card containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$card-spacer-y:                     0.75rem !default;
+$card-spacer-x:                     1.25rem !default;
+$card-border-width:                 $border-width !default;
+$card-border-radius:                $border-radius !default;
+$card-border-color:                 rgba($black, 0.125) !default;
+$card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default;
+$card-cap-bg:                       rgba($black, 0.03) !default;
+$card-cap-color:                    null !default;
+$card-color:                        null !default;
+$card-bg:                           $white !default;
+
+$card-img-overlay-padding:          1.25rem !default;
+
+$card-group-margin:                 $grid-gutter-width / 2 !default;
+$card-deck-margin:                  $card-group-margin !default;
+
+$card-columns-count:                3 !default;
+$card-columns-gap:                  1.25rem !default;
+$card-columns-margin:               $card-spacer-y !default;
+
+///
+/// TOOLTIPS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Tooltip containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$tooltip-font-size:                 $font-size-sm !default;
+$tooltip-max-width:                 200px !default;
+$tooltip-color:                     $white !default;
+$tooltip-bg:                        $black !default;
+$tooltip-border-radius:             $border-radius !default;
+$tooltip-opacity:                   0.9 !default;
+$tooltip-padding-y:                 0.25rem !default;
+$tooltip-padding-x:                 0.5rem !default;
+$tooltip-margin:                    0 !default;
+
+$tooltip-arrow-width:               0.8rem !default;
+$tooltip-arrow-height:              0.4rem !default;
+$tooltip-arrow-color:               $tooltip-bg !default;
+
+/// Form tooltips must come after regular tooltips
+$form-feedback-tooltip-padding-y:     $tooltip-padding-y !default;
+$form-feedback-tooltip-padding-x:     $tooltip-padding-x !default;
+$form-feedback-tooltip-font-size:     $tooltip-font-size !default;
+$form-feedback-tooltip-line-height:   $line-height-base !default;
+$form-feedback-tooltip-opacity:       $tooltip-opacity !default;
+$form-feedback-tooltip-border-radius: $tooltip-border-radius !default;
+
+///
+/// POPOVERS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Popover containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$popover-font-size:                 $font-size-sm !default;
+$popover-bg:                        $white !default;
+$popover-max-width:                 276px !default;
+$popover-border-width:              $border-width !default;
+$popover-border-color:              rgba($black, 0.2) !default;
+$popover-border-radius:             $border-radius-lg !default;
+$popover-box-shadow:                0 0.25rem 0.5rem rgba($black, 0.2) !default;
+
+$popover-header-bg:                 darken($popover-bg, 3%) !default;
+$popover-header-color:              $headings-color !default;
+$popover-header-padding-y:          0.5rem !default;
+$popover-header-padding-x:          0.75rem !default;
+
+$popover-body-color:                $body-color !default;
+$popover-body-padding-y:            $popover-header-padding-y !default;
+$popover-body-padding-x:            $popover-header-padding-x !default;
+
+$popover-arrow-width:               1rem !default;
+$popover-arrow-height:              0.5rem !default;
+$popover-arrow-color:               $popover-bg !default;
+
+$popover-arrow-outer-color:         fade-in($popover-border-color, 0.05) !default;
+
+///
+/// TOASTS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Toast containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$toast-max-width:                   350px !default;
+$toast-padding-x:                   0.75rem !default;
+$toast-padding-y:                   0.25rem !default;
+$toast-font-size:                   0.875rem !default;
+$toast-color:                       null !default;
+$toast-background-color:            rgba($white, 0.85) !default;
+$toast-border-width:                1px !default;
+$toast-border-color:                rgba($black, 0.1) !default;
+$toast-border-radius:               $border-radius !default;
+$toast-box-shadow:                  0 0.25rem 0.75rem rgba($black, 0.1) !default;
+
+$toast-header-color:                $gray-600 !default;
+$toast-header-background-color:     rgba($white, 0.85) !default;
+$toast-header-border-color:         rgba($black, 0.05) !default;
+
+///
+/// BADGES
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Badge containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$badge-font-size:                   75% !default;
+$badge-font-weight:                 $font-weight-bold !default;
+$badge-color:                       $white !default;
+$badge-padding-y:                   0.25em !default;
+$badge-padding-x:                   0.5em !default;
+$badge-border-radius:               $border-radius !default;
+
+///
+/// MODALS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Modal containers and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+/// Padding applied to the modal body.
+$modal-inner-padding:               1rem !default;
+
+$modal-dialog-margin:               0.5rem !default;
+$modal-dialog-margin-y-sm-up:       1.75rem !default;
+
+$modal-title-line-height:           $line-height-base !default;
+
+$modal-content-color:               null !default;
+$modal-content-bg:                  $white !default;
+$modal-content-border-color:        rgba($black, 0.2) !default;
+$modal-content-border-width:        $border-width !default;
+$modal-content-border-radius:       $border-radius-lg !default;
+$modal-content-box-shadow-xs:       0 0.25rem 0.5rem rgba($black, 0.5) !default;
+$modal-content-box-shadow-sm-up:    0 0.5rem 1rem rgba($black, 0.5) !default;
+
+$modal-backdrop-bg:                 $black !default;
+$modal-backdrop-opacity:            0.5 !default;
+$modal-header-border-color:         $border-color !default;
+$modal-footer-border-color:         $modal-header-border-color !default;
+$modal-header-border-width:         $modal-content-border-width !default;
+$modal-footer-border-width:         $modal-header-border-width !default;
+$modal-header-padding-y:            1rem !default;
+$modal-header-padding-x:            1rem !default;
+$modal-header-padding:              $modal-header-padding-y $modal-header-padding-x !default;    /// Keep This For Backwards Compatibility
+
+$modal-xl:                          1140px !default;
+$modal-lg:                          800px !default;
+$modal-md:                          500px !default;
+$modal-sm:                          300px !default;
+
+$modal-fade-transform:              translate(0, -50px) !default;
+$modal-show-transform:              none !default;
+$modal-transition:                  transform 0.3s ease-out !default;
+
+///
+/// ALERTS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Define alert colors, border radius, and padding.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$alert-padding-y:                   0.75rem !default;
+$alert-padding-x:                   1.25rem !default;
+$alert-margin-bottom:               1rem !default;
+$alert-border-radius:               $border-radius !default;
+$alert-link-font-weight:            $font-weight-bold !default;
+$alert-border-width:                $border-width !default;
+
+$alert-bg-level:                    -10 !default;
+$alert-border-level:                -9 !default;
+$alert-color-level:                 6 !default;
+
+///
+/// PROGRESS BARS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Progress bar container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$progress-height:                   1rem !default;
+$progress-font-size:                $font-size-base * 0.75 !default;
+$progress-bg:                       $gray-200 !default;
+$progress-border-radius:            $border-radius !default;
+$progress-box-shadow:               inset 0 0.1rem 0.1rem rgba($black, 0.1) !default;
+$progress-bar-color:                $white !default;
+$progress-bar-bg:                   theme-color("primary") !default;
+$progress-bar-animation-timing:     1s linear infinite !default;
+$progress-bar-transition:           width 0.6s ease !default;
+
+///
+/// LIST GROUP
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description List group container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$list-group-color:                  null !default;
+$list-group-bg:                     $white !default;
+$list-group-border-color:           rgba($black, 0.125) !default;
+$list-group-border-width:           $border-width !default;
+$list-group-border-radius:          $border-radius !default;
+
+$list-group-item-padding-y:         0.75rem !default;
+$list-group-item-padding-x:         1.25rem !default;
+
+$list-group-hover-bg:               $gray-100 !default;
+$list-group-active-color:           $component-active-color !default;
+$list-group-active-bg:              $component-active-bg !default;
+$list-group-active-border-color:    $list-group-active-bg !default;
+
+$list-group-disabled-color:         $gray-600 !default;
+$list-group-disabled-bg:            $list-group-bg !default;
+
+$list-group-action-color:           $gray-700 !default;
+$list-group-action-hover-color:     $list-group-action-color !default;
+
+$list-group-action-active-color:    $body-color !default;
+$list-group-action-active-bg:       $gray-200 !default;
+
+///
+/// IMAGE THUMBNAILS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Image thumbnail container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$thumbnail-padding:                 0.25rem !default;
+$thumbnail-bg:                      $body-bg !default;
+$thumbnail-border-width:            $border-width !default;
+$thumbnail-border-color:            $gray-300 !default;
+$thumbnail-border-radius:           $border-radius !default;
+$thumbnail-box-shadow:              0 1px 2px rgba($black, 0.075) !default;
+
+
+///
+/// FIGURES
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description `<figure>` container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$figure-caption-font-size:          90% !default;
+$figure-caption-color:              $gray-600 !default;
+
+///
+/// BREADCRUMBS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Breadcrumb container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$breadcrumb-padding-y:              0.75rem !default;
+$breadcrumb-padding-x:              1rem !default;
+$breadcrumb-item-padding-x:         0.5rem !default;
+
+$breadcrumb-margin-bottom:          1rem !default;
+
+$breadcrumb-bg:                     $gray-200 !default;
+$breadcrumb-divider-color:          $gray-600 !default;
+$breadcrumb-active-color:           $gray-600 !default;
+$breadcrumb-divider:                quote("/") !default;
+
+$breadcrumb-border-radius:          $border-radius !default;
+
+///
+/// CAROUSEL
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Carousel container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$carousel-control-color:             $white !default;
+$carousel-control-width:             15% !default;
+$carousel-control-opacity:           0.5 !default;
+$carousel-control-hover-opacity:     0.9 !default;
+$carousel-control-transition:        opacity 0.15s ease !default;
+
+$carousel-indicator-width:           30px !default;
+$carousel-indicator-height:          3px !default;
+$carousel-indicator-hit-area-height: 10px !default;
+$carousel-indicator-spacer:          3px !default;
+$carousel-indicator-active-bg:       $white !default;
+$carousel-indicator-transition:      opacity 0.6s ease !default;
+
+$carousel-caption-width:             70% !default;
+$carousel-caption-color:             $white !default;
+
+$carousel-control-icon-width:        20px !default;
+
+$carousel-control-prev-icon-bg:      str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='#{$carousel-control-color}' viewBox='0 0 8 8'%3e%3cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3e%3c/svg%3e"), "#", "%23") !default;
+$carousel-control-next-icon-bg:      str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='#{$carousel-control-color}' viewBox='0 0 8 8'%3e%3cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3e%3c/svg%3e"), "#", "%23") !default;
+
+$carousel-transition-duration:       0.6s !default;
+/// Define Transform Transition First If Using Multiple Transitions (e.g., `transform 2s ease, opacity 0.5s ease-out`)
+$carousel-transition:                transform $carousel-transition-duration ease-in-out !default;
+
+///
+/// SPINNERS
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Spinner container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$spinner-width:         2rem !default;
+$spinner-height:        $spinner-width !default;
+$spinner-border-width:  0.25em !default;
+
+$spinner-width-sm:        1rem !default;
+$spinner-height-sm:       $spinner-width-sm !default;
+$spinner-border-width-sm: 0.2em !default;
+
+///
+/// CLOSE
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description `.close` container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$close-font-size:                   $font-size-base * 1.5 !default;
+$close-font-weight:                 $font-weight-bold !default;
+$close-color:                       $black !default;
+$close-text-shadow:                 0 1px 0 $white !default;
+
+///
+/// CODE
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description `<code>` container and contents.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$code-font-size:                    87.5% !default;
+$code-color:                        $pink !default;
+
+$kbd-padding-y:                     0.2rem !default;
+$kbd-padding-x:                     0.4rem !default;
+$kbd-font-size:                     $code-font-size !default;
+$kbd-color:                         $white !default;
+$kbd-bg:                            $gray-900 !default;
+
+$pre-color:                         $gray-900 !default;
+$pre-scrollable-max-height:         340px !default;
+
+///
+/// UTILITIES
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Shared variables that are reassigned to Bootstrap's utility classes.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$displays: none, inline, inline-block, block, table, table-row, table-cell, flex, inline-flex !default;
+$overflows: auto, hidden !default;
+$positions: static, relative, absolute, fixed, sticky !default;
+
+///
+/// PRINTING
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Shared variables that are reassigned to Bootstrap's print styles.
+/// @author Bruce Bentley
+/// @access public
+/// @group variables
+///
+$print-page-size:                   a3 !default;
+$print-body-min-width:              map-get($grid-breakpoints, "lg") !default;
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// MIXINS
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description CSS & Sass mixins that can be easily be referenced globally across your web-application(s).
+/// @author Bruce Bentley
+/// @link https://brucebentley.io/
+/// @access public
+/// @group mixins
+///
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+/// RFS — RESPONSIVE FONT SIZES
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Automated responsive font sizes.
+/// @author Bruce Bentley
+/// @access public
+/// @group mixins
+///
+
+///
+/// CONFIGURATION
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Configuration used to enable responsive font sizes.
+/// @author Bruce Bentley
+/// @access public
+/// @group mixins
+///
+/// BASE FONT SIZE.
+/// @type Number (unit)
+$rfs-base-font-size: 1.25rem !default;
+
+/// FONT SIZE UNIT.
+/// @type String (unit)
+$rfs-font-size-unit: rem !default;
+
+@if $rfs-font-size-unit != rem and $rfs-font-size-unit != px {
+    @error "`#{$rfs-font-size-unit}` is not a valid unit for $rfs-font-size-unit. Use `px` or `rem`.";
+}
+
+/// BREAKPOINT AT WHERE FONT-SIZE STARTS DECREASING IF SCREEN WIDTH IS SMALLER.
+/// @type Number
+$rfs-breakpoint: 1200px !default;
+
+/// BREAKPOINT UNIT.
+/// @type String
+$rfs-breakpoint-unit: px !default;
+
+@if $rfs-breakpoint-unit != px and $rfs-breakpoint-unit != em and $rfs-breakpoint-unit != rem {
+    @error "`#{$rfs-breakpoint-unit}` is not a valid unit for $rfs-breakpoint-unit. Use `px`, `em` or `rem`.";
+}
+
+/// RESIZE FONT SIZE BASED ON SCREEN HEIGHT AND WIDTH.
+/// @type Boolean
+$rfs-two-dimensional: false !default;
+
+/// FACTOR OF DECREASE.
+/// @type Number
+$rfs-factor: 10 !default;
+
+@if type-of($rfs-factor) != "number" or $rfs-factor <= 1 {
+    @error "`#{$rfs-factor}` is not a valid  $rfs-factor, it must be greater than 1.";
+}
+
+/// GENERATE ENABLE OR DISABLE CLASSES. POSSIBILITIES: false, "enable" OR "disable".
+/// @type Boolean
+$rfs-class: false !default;
+
+/// 1 REM = $rfs-rem-value PX.
+/// @type Number
+$rfs-rem-value: 16 !default;
+
+/// SAFARI IFRAME RESIZE BUG: https://github.com/twbs/rfs/issues/14.
+/// @type Boolean
+$rfs-safari-iframe-resize-bug-fix: false !default;
+
+/// DISABLE RFS BY SETTING $enable-responsive-font-sizes TO FALSE.
+/// @type Boolean
+$enable-responsive-font-sizes: true !default;
+
+/// CACHE $rfs-base-font-size UNIT.
+/// @requires {Variable} $rfs-base-font-size
+$rfs-base-font-size-unit: unit($rfs-base-font-size);
+
+/// REMOVE PX-UNIT FROM $rfs-base-font-size FOR CALCULATIONS.
+@if $rfs-base-font-size-unit == "px" {
+    $rfs-base-font-size: ($rfs-base-font-size / ($rfs-base-font-size * 0 + 1));
+}
+@else if $rfs-base-font-size-unit == "rem" {
+    $rfs-base-font-size: ($rfs-base-font-size / ($rfs-base-font-size * 0 + 1 / $rfs-rem-value));
+}
+
+/// CACHE $rfs-breakpoint UNIT TO PREVENT MULTIPLE CALLS.
+$rfs-breakpoint-unit-cache: unit($rfs-breakpoint);
+
+/// REMOVE UNIT FROM $rfs-breakpoint FOR CALCULATIONS.
+@if $rfs-breakpoint-unit-cache == "px" {
+    $rfs-breakpoint: ($rfs-breakpoint / ($rfs-breakpoint * 0 + 1));
+}
+@else if $rfs-breakpoint-unit-cache == "rem" or $rfs-breakpoint-unit-cache == "em" {
+    $rfs-breakpoint: ($rfs-breakpoint / ($rfs-breakpoint * 0 + 1 / $rfs-rem-value));
+}
+
+///
+/// RFS DISABLE CLASSES MIXIN —[ INTERNAL ]—
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Internal mixin that adds disable classes to the selector if needed.
+/// @author Bruce Bentley
+/// @access private
+/// @group mixins
+///
+@mixin _rfs-disable-class {
+    @if $rfs-class == "disable" {
+        /// ADDING AN EXTRA CLASS INCREASES SPECIFICITY, WHICH PREVENTS THE MEDIA QUERY TO OVERRIDE THE FONT SIZE.
+        &,
+        .disable-responsive-font-size &,
+        &.disable-responsive-font-size {
+            @content;
+        }
+    }
+    @else {
+        @content;
+    }
+}
+
+///
+/// RFS ENABLE CLASSES MIXIN —[ INTERNAL ]—
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Internal mixin that adds enable classes to the selector if needed.
+/// @author Bruce Bentley
+/// @access private
+/// @group mixins
+///
+@mixin _rfs-enable-class {
+    @if $rfs-class == "enable" {
+        .enable-responsive-font-size &,
+        &.enable-responsive-font-size {
+            @content;
+        }
+    }
+    @else {
+        @content;
+    }
+}
+
+///
+/// RFS MEDIA QUERY MIXIN —[ INTERNAL ]—
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Internal mixin used to determine which media query needs to be used.
+/// @author Bruce Bentley
+/// @access private
+/// @group mixins
+///
+/// @param {Number} $width
+/// @requires {Variable} $mq-value
+///
+@mixin _rfs-media-query($mq-value) {
+    @if $rfs-two-dimensional {
+        @media (max-width: #{$mq-value}), (max-height: #{$mq-value}) {
+            @content;
+        }
+    }
+    @else {
+        @media (max-width: #{$mq-value}) {
+            @content;
+        }
+    }
+}
+
+///
+/// RESPONSIVE FONT SIZES MIXIN
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description The `responsive-font-size` mixin uses `rfs` to rescale the font size.
+/// @author Bruce Bentley
+/// @access public
+/// @group mixins
+///
+/// @param {Number} $fs - Element's `font-size`.
+/// @requires {Mixin} $_rfs-disable-class
+/// @requires {Mixin} $_rfs-media-query
+/// @requires {Mixin} $_rfs-enable-class
+/// @requires {Variable} $fs
+///
+/// @example scss - Usage
+///   .foo {
+///     @include rfs($font-size-base);
+///   }
+///
+/// @example css - CSS output
+///   .foo {
+///     font-size: 1rem;
+///   }
+///
+@mixin rfs($fs, $important: false) {
+    /// CACHE $fs UNIT.
+    $fs-unit: if(type-of($fs) == "number", unit($fs), false);
+
+    /// ADD !important SUFFIX IF NEEDED.
+    $rfs-suffix: if($important, " !important", "");
+
+    /// IF $fs ISN'T A NUMBER (LIKE INHERIT) OR $fs HAS A UNIT (NOT px OR rem, LIKE 1.5em) OR $ IS 0, JUST PRINT THE VALUE.
+    @if not $fs-unit or $fs-unit != "" and $fs-unit != "px" and $fs-unit != "rem" or $fs == 0 {
+        font-size: #{$fs}#{$rfs-suffix};
+    }
+    @else {
+        /// REMOVE UNIT FROM $fs FOR CALCULATIONS.
+        @if $fs-unit == "px" {
+            $fs: ($fs / ($fs * 0 + 1));
+        }
+        @else if $fs-unit == "rem" {
+            $fs: ($fs / ($fs * 0 + 1 / $rfs-rem-value));
+        }
+
+        /// SET DEFAULT FONT SIZE.
+        $rfs-static: if($rfs-font-size-unit == rem, #{$fs / $rfs-rem-value}rem, #{$fs}px);
+
+        /// ONLY ADD THE MEDIA QUERY IF THE FONT SIZE IS BIGGER THAN THE MINIMUM FONT SIZE.
+        @if $fs <= $rfs-base-font-size or not $enable-responsive-font-sizes {
+            font-size: #{$rfs-static}#{$rfs-suffix};
+        }
+        @else {
+            /// CALCULATE THE MINIMUM FONT SIZE FOR $fs.
+            $fs-min: ($rfs-base-font-size + ($fs - $rfs-base-font-size) / $rfs-factor);
+
+            /// CALCULATE DIFFERENCE BETWEEN $fs AND THE MINIMUM FONT SIZE.
+            $fs-diff: ($fs - $fs-min);
+
+            /// BASE FONT-SIZE FORMATTING.
+            $min-width: if($rfs-font-size-unit == rem, #{$fs-min / $rfs-rem-value}rem, #{$fs-min}px);
+
+            /// USE `vmin` IF TWO-DIMENSIONAL IS ENABLED.
+            $variable-unit: if($rfs-two-dimensional, vmin, vw);
+
+            /// CALCULATE THE VARIABLE WIDTH BETWEEN 0 AND $rfs-breakpoint.
+            $variable-width: #{$fs-diff * 100 / $rfs-breakpoint}#{$variable-unit};
+
+            /// SET THE CALCULATED FONT-SIZE.
+            $rfs-fluid: calc(#{$min-width} + #{$variable-width}) #{$rfs-suffix};
+
+            /// BREAKPOINT FORMATTING.
+            $mq-value: if($rfs-breakpoint-unit == px, #{$rfs-breakpoint}px, #{$rfs-breakpoint / $rfs-rem-value}#{$rfs-breakpoint-unit});
+
+            @include _rfs-disable-class {
+                font-size: #{$rfs-static}#{$rfs-suffix};
+            }
+
+            @include _rfs-media-query($mq-value) {
+                @include _rfs-enable-class {
+                    font-size: $rfs-fluid;
+                }
+
+                /// INCLUDE SAFARI IFRAME RESIZE FIX IF NEEDED.
+                min-width: if($rfs-safari-iframe-resize-bug-fix, (0 * 1vw), null);
+            }
+        }
+    }
+}
+
+///
+/// FONT-SIZE MIXIN
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description The `font-size` mixin uses `rfs` to rescale the font size.
+/// @author Bruce Bentley
+/// @access public
+/// @group mixins
+///
+/// @param {Number} $fs - Element’s `font-size`.
+/// @requires {Mixin} $rfs
+/// @requires {Variable} $fs
+///
+/// @example scss - Usage
+///   .foo {
+///     @include font-size($font-size-base);
+///   }
+///
+///   .bar {
+///     @include font-size($h1-font-size);
+///   }
+///
+/// @example css - CSS output
+///   .foo {
+///     font-size: 1rem
+///   }
+///
+///   .bar {
+///     font-size: 2.5rem;
+///   }
+///
+@mixin font-size($fs, $important: false) {
+    @include rfs($fs, $important);
+}
+
+///
+/// RESPONSIVE FONT-SIZE MIXIN
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description The `responsive-font-size` mixin uses `rfs` to rescale the font size.
+/// @author Bruce Bentley
+/// @access public
+/// @group mixins
+///
+/// @param {Mixin} $rfs - The responsive font-size mixin.
+/// @requires {Mixin} $rfs
+/// @requires {Variable} $fs
+///
+/// @example scss - Usage
+///   .foo {
+///     @include responsive-font-size($font-size-base);
+///   }
+///
+/// @example css - CSS output
+///   .foo {
+///     font-size: 1rem
+///   }
+///
+@mixin responsive-font-size($fs, $important: false) {
+    @include rfs($fs, $important);
+}
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// COMPONENTS
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description Styles for any custom components.
+/// @author Bruce Bentley
+/// @link https://brucebentley.io/
+/// @access public
+/// @group components
+///
+
+///
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+/// BLOCKQUOTE STYLES
+/// - - - - - - - - - - - - - - - - - - - - - - - - -
+///
+/// @description styles for the example <blockquote> component.
+/// @author Bruce Bentley
+/// @link https://brucebentley.io/
+/// @require
+/// @access public
+/// @group components
+///
+.blockquote {
+    @include font-size($blockquote-font-size);
+    border: $blockquote-border-width solid rgba($blockquote-border-color, 0.54);
+    border-left: $blockquote-border-accent-width solid rgba($blockquote-border-accent-color, 0.54);
+    color: $blockquote-color;
+    font-family: $font-family-base;
+    font-style: $blockquote-font-style;
+    line-height: 1.6;
+    margin: $blockquote-margin auto;
+    max-width: 60%;
+    padding: ($blockquote-margin * 2.5) $blockquote-margin $blockquote-margin ($blockquote-margin * 2.5);
+    position: relative;
+    width: 100%;
+
+    &:before {
+        @include font-size(($blockquote-font-size * 5.5));
+        color: rgba($blockquote-border-accent-color, 0.54);
+        content: '\201C';
+        font-family: $font-family-serif;
+        font-size: $display2-size;
+        height: ($blockquote-margin * 2);
+        left: ($blockquote-margin / 2);
+        line-height: 1;
+        max-width: ($blockquote-margin * 2);
+        position: absolute;
+        text-align: inherit;
+        top: ($blockquote-margin / 2);
+        width: 100%;
+    }
+
+    &:after {
+        content: '';
+    }
+
+    &-footer {
+        @include font-size($blockquote-small-font-size);
+        color: $blockquote-small-color;
+        display: block;
+        font-style: normal;
+        font-weight: $font-weight-bold;
+        margin-top: 1rem;
+        padding: 0;
+
+        &:before {
+            content: '\2014\00A0';
+        }
+    }
+}
+
