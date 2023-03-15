@@ -4,7 +4,11 @@
 
 Our application will be responsible for showing motivating messages to logged users. Only the user with the admin role will be able to access admin menu and create new messages quotes.
 
-You can find more information on my article on [`Medium`](https://medium.com/@ricardohsmello/quarkus-with-angular-secured-with-keycloak-pt1-d1c00a4923b8) 
+You can read more on my <b>medium</b> article.
+
+- [`Quarkus + Angular secured with Keycloak`](https://medium.com/@ricardohsmello/quarkus-with-angular-secured-with-keycloak-pt1-d1c00a4923b8) 
+
+ 
 
 ## Built With
 
