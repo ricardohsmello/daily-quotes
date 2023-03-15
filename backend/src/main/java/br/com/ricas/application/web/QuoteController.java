@@ -22,8 +22,8 @@ public class QuoteController {
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     public QuoteResponse create(Quote quote) {
-        Quote q =  quoteService.create(quote);
-        return new QuoteResponse(q.getMessage(), q.getAuthor());
+        quoteService.create(quote);
+        return new QuoteResponse(quote.getMessage(), quote.getAuthor());
     }
 
     @GET()
