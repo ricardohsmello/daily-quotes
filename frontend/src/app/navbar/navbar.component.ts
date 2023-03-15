@@ -9,11 +9,13 @@ import { KeycloakService } from 'keycloak-angular';
 export class NavbarComponent implements OnInit {
   constructor(private readonly keycloak: KeycloakService) { }
 
+  public hasAdminRole: boolean = false;
+
   ngOnInit(): void {
-  }
-
+    this.hasAdminRole = this.keycloak.getUserRoles().includes('admin');
+   }
+ 
   public async logout() {
-    this.keycloak.logout();
+     this.keycloak.logout();
   }
-
 }
