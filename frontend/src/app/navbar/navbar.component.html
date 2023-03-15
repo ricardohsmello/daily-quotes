@@ -1,9 +1,13 @@
 <mat-toolbar color="primary">
+  Daily Quotes
   <a mat-button href="/">Home</a>
   <a mat-button href="/quotes">Quotes</a>
-  <button mat-button [matMenuTriggerFor]="afterMenu">Admin</button>
-  <mat-menu #afterMenu="matMenu" xPosition="after">
-    <button mat-menu-item onclick="logout()">Add new Quote</button>
-  </mat-menu>
+
+  <div *ngIf="hasAdminRole">
+    <button mat-button [matMenuTriggerFor]="afterMenu">Admin</button>
+    <mat-menu #afterMenu="matMenu" xPosition="after">
+      <button mat-menu-item onclick="logout()">Add new Quote</button>
+    </mat-menu>
+  </div>
   <a mat-button (click)="logout()">Logout</a>
 </mat-toolbar>
