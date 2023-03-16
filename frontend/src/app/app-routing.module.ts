@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdminComponent } from './admin/admin.component';
+import { AdminComponent } from './component/admin/admin.component';
 import { AppComponent } from './app.component';
-import { QuotesComponent } from './quotes/quotes.component';
+import { QuoteListComponent } from './component/quote-list/quote-list.component';
 
 
 const routes: Routes = [
   { path: 'home', component: AppComponent },
-  { path: 'quotes', component: QuotesComponent },
+  { path: 'quotes', component: QuoteListComponent },
   { path: 'admin', component: AdminComponent },
 ];
 
