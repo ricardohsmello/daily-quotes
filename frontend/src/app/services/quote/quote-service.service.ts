@@ -17,4 +17,8 @@ export class QuoteService {
   public findAll(): Observable<Quote[]> {
     return this.http.get<Quote[]>(this.quoteUrl);
   }
+  
+  public save(quote: Quote) {
+    this.http.post<Quote>(this.quoteUrl, quote).subscribe(result => console.log(result));
+  } 
 }

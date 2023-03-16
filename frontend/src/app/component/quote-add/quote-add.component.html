@@ -1,0 +1,19 @@
+<div class="form">
+    <h1 mat-dialog-title>Create new Quote</h1>
+
+    <div mat-dialog-content>
+        <mat-form-field class="field-author" appearance="outline">
+            <mat-label>Author</mat-label>
+            <input matInput [(ngModel)]="data.author">
+
+        </mat-form-field>
+        <mat-form-field class="field-message" appearance="outline">
+            <mat-label>Message</mat-label>
+            <textarea matInput [(ngModel)]="data.message"></textarea>
+        </mat-form-field>
+    </div>
+</div>
+<div mat-dialog-actions class="buttons">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button mat-button [mat-dialog-close]="data">Create</button>
+</div>
