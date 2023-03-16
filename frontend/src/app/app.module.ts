@@ -6,7 +6,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './component/navbar/navbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { AdminComponent } from './component/admin/admin.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
@@ -40,10 +39,10 @@ export function initializeKeycloak(keycloak: KeycloakService) {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
     AppComponent,
+    QuoteAddComponent,
     QuoteListComponent,
     NavbarComponent,
-    AdminComponent,
-    QuoteAddComponent,
+    
   ],
   imports: [
     BrowserModule,

@@ -38,10 +38,18 @@ export class NavbarComponent implements OnInit {
       data: {message: this.message, author: this.author},
     })
 
-    dialogRef.afterClosed().subscribe(result => {      
-      this.quoteService.save(result)
-      this.router.navigate(['quotes']);
-    });
+    dialogRef.afterClosed().subscribe(async result => {      
+      (await this.quoteService.save(result)).subscribe( result =>
+        this.redirectTo('quotes')
+        );      
+    }    
+
+);
   }
+  redirectTo(uri:string){
+    this.router.navigateByUrl('/', {skipLocationChange: true}).then(()=>
+    this.router.navigate([uri]));
+ }
+
 
 }
