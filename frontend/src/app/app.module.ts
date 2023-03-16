@@ -3,14 +3,17 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { QuotesComponent } from './quotes/quotes.component';
-import { NavbarComponent } from './navbar/navbar.component';
+import { NavbarComponent } from './component/navbar/navbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { AdminComponent } from './admin/admin.component';
+import { AdminComponent } from './component/admin/admin.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import { QuoteListComponent } from './component/quote-list/quote-list.component';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { QuoteAddComponent } from './quote-add/quote-add.component';
 
 export function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -31,12 +34,14 @@ export function initializeKeycloak(keycloak: KeycloakService) {
 @NgModule({
   declarations: [
     AppComponent,
-    QuotesComponent,
+    QuoteListComponent,
     NavbarComponent,
     AdminComponent,
+    QuoteAddComponent,
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,
@@ -44,7 +49,9 @@ export function initializeKeycloak(keycloak: KeycloakService) {
     MatMenuModule,
     MatIconModule,
     KeycloakAngularModule,
+    HttpClientModule,
   ],
+
   providers: [
     {
       provide: APP_INITIALIZER,
