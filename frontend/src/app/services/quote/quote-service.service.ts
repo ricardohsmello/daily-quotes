@@ -1,3 +1,4 @@
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -18,7 +19,7 @@ export class QuoteService {
     return this.http.get<Quote[]>(this.quoteUrl);
   }
   
-  public save(quote: Quote) {
-    this.http.post<Quote>(this.quoteUrl, quote).subscribe(result => console.log(result));
+  async save(quote: Quote): Promise<Observable<Quote>>{
+    return this.http.post<Quote>(this.quoteUrl, quote); 
   } 
 }
