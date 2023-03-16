@@ -13,7 +13,12 @@ import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { QuoteListComponent } from './component/quote-list/quote-list.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { QuoteAddComponent } from './quote-add/quote-add.component';
+import { QuoteAddComponent } from './component/quote-add/quote-add.component';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MaterialExampleModule } from 'src/material.module';
 
 export function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -32,6 +37,7 @@ export function initializeKeycloak(keycloak: KeycloakService) {
 }
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
     AppComponent,
     QuoteListComponent,
@@ -50,6 +56,12 @@ export function initializeKeycloak(keycloak: KeycloakService) {
     MatIconModule,
     KeycloakAngularModule,
     HttpClientModule,
+    MatDialogModule,    
+    FormsModule,
+    MatDialogModule,
+    MatNativeDateModule,
+    MaterialExampleModule,
+    ReactiveFormsModule,
   ],
 
   providers: [
@@ -58,8 +70,10 @@ export function initializeKeycloak(keycloak: KeycloakService) {
       useFactory: initializeKeycloak,
       multi: true,
       deps: [KeycloakService],
-    }    
+    },
+    MatDialog
   ],
+  
   bootstrap: [AppComponent]
 })
 export class AppModule { }
