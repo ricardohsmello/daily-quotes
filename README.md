@@ -12,7 +12,6 @@ You can read more on my <b>medium</b> article.
 
 
 
- 
  https://miro.medium.com/v2/resize:fit:720/1*xG1J4FwF5JtlixN70GkkxA.gif
 
 ## Built With
