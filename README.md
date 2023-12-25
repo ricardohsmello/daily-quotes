@@ -11,7 +11,7 @@ You can read more on my <b>medium</b> article.
 ![Application sample](https://user-images.githubusercontent.com/21324963/225694855-0832bcfb-93be-4c7f-9c0a-f85c71ed0740.gif)
 
 
- https://miro.medium.com/v2/resize:fit:720/1*xG1J4FwF5JtlixN70GkkxA.gif
+https://miro.medium.com/v2/resize:fit:720/1*xG1J4FwF5JtlixN70GkkxA.gif
 
 ## Built With
 
